@@ -1,0 +1,35 @@
+---
+# tasks file for ansible-role-influxdb
+
+- include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+
+- include: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+
+# - name: 'TEST ONLY: Create directory'
+#   file:
+#     path: /etc/influxdb
+#     owner: root
+#     group: root
+#     state: directory
+#     mode: 0775
+
+- name: 'Set configuration'
+  template:
+    src: "{{ influxdb_conf_template }}"
+    dest: "{{ influxdb_conf_path }}"
+    owner: root
+    group: root
+    mode:  0644
+  notify: restart influxdb
+
+- name: 'Start service'
+  service:
+    name: "{{ influxdb_service_name }}"
+    state: started
+    enabled: true
