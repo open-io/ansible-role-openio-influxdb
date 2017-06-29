@@ -11,7 +11,7 @@
 {% endif %}
 {% if value is iterable %}
 {% for mykey in value %}
-{{ mykey }} = '{{ value[mykey] }}'
+{{ mykey }} = {{ value[mykey] }}
 {% endfor %}
 {% endif %}
 

@@ -22,6 +22,8 @@ IFS=$'\t\n'   # Split on newlines and tabs (but not on spaces)
 readonly container_id="$(mktemp)"
 readonly role_dir='/etc/ansible/roles/influxdb'
 readonly test_playbook="${role_dir}/tests/test.yml"
+readonly inventory="${role_dir}/tests/inventory"
+readonly ansiblecfg="${role_dir}/tests/ansible.cfg"
 
 readonly docker_image="bertvv/ansible-testing"
 
@@ -109,12 +111,12 @@ exec_container() {
 
 run_syntax_check() {
   log "Running syntax check on playbook"
-  exec_container ansible-playbook "${test_playbook}" --syntax-check
+  exec_container ANSIBLE_CONFIG="${ansiblecfg}" ansible-playbook "${test_playbook}" --syntax-check
 }
 
 run_playbook() {
   log "Running playbook"
-  exec_container ansible-playbook "${test_playbook}" --diff
+  exec_container ANSIBLE_CONFIG="${ansiblecfg}" ansible-playbook -i "${inventory}" "${test_playbook}" --diff
   log "Run finished"
 }
 
@@ -123,7 +125,7 @@ run_idempotence_test() {
   local output
   output="$(mktemp)"
 
-  exec_container ansible-playbook "${test_playbook}" 2>&1 | tee "${output}"
+  exec_container ANSIBLE_CONFIG="${ansiblecfg}" ansible-playbook -i "${inventory}" "${test_playbook}" 2>&1 | tee "${output}"
 
   if grep -q 'changed=0.*failed=0' "${output}"; then
     result='pass'
