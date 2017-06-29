@@ -1,0 +1,18 @@
+{% if influxdb_conf.global %}
+{% for gkey in influxdb_conf.global %}
+{{ gkey }} = {{ influxdb_conf['global'][gkey] }}
+{% endfor %}
+{% endif %}
+{% for key, value in influxdb_conf.items() if not key == 'global' %}
+{% if key in influxdb_conf_doublebrackets %}
+[[{{ key }}]]
+{% else %}
+[{{ key }}]
+{% endif %}
+{% if value is iterable %}
+{% for mykey in value %}
+{{ mykey }} = '{{ value[mykey] }}'
+{% endfor %}
+{% endif %}
+
+{% endfor %}
