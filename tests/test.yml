@@ -76,7 +76,13 @@
     "netdata.*.apps.threads.openio.* .host...measurement.servicetype resource=threads",
     "netdata.*.apps.pipes.openio.* .host...measurement.servicetype resource=pipes",
     "netdata.*.apps.sockets.openio.* .host...measurement.servicetype resource=sockets",
-    "netdata.*.web_log_.openio.*.*.*.log.* .host..measurement.namespace.servicetype.serviceid.measurement..measurement.type"]'}
+    "netdata.*.web_log_.openio.*.*.*.log.* .host..measurement.namespace.servicetype.serviceid.measurement..measurement.type",
+    "netdata.* measurement.u",
+    "netdata.*.* measurement.u.u",
+    "netdata.*.*.* measurement.u.u.u",
+    "netdata.*.*.*.* measurement.u.u.u.u",
+    "netdata.*.*.*.*.* measurement.u.u.u.u.u",
+    "netdata.*.*.*.*.*.* measurement.u.u.u.u.u.u"]'}
                           }
     }
 
