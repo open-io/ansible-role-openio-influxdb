@@ -16,3 +16,11 @@
 {% endif %}
 
 {% endfor %}
+
+
+
+[[graphite]]
+
+templates = [
+    {{influxdb_graphite_tpl | union(influxdb_graphite_tpl_custom['add']) | difference(influxdb_graphite_tpl_custom['del']) | join(',\n')}}
+]

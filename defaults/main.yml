@@ -2,6 +2,12 @@
 # defaults file for ansible-role-influxdb
 
 influxdb_version: '1.2.4'
+
+
+influxdb_graphite_tpl_custom:
+    add:
+    del:
+
 influxdb_conf_template: influxdb.conf.j2
 influxdb_conf_path: /etc/influxdb/influxdb.conf
 influxdb_service_name: influxdb
