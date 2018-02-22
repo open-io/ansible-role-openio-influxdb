@@ -1,26 +1,49 @@
-{% if influxdb_conf.global %}
-{% for gkey in influxdb_conf.global %}
-{{ gkey }} = {{ influxdb_conf['global'][gkey] }}
-{% endfor %}
-{% endif %}
-{% for key, value in influxdb_conf.items() if not key == 'global' %}
-{% if key in influxdb_conf_doublebrackets %}
-[[{{ key }}]]
-{% else %}
-[{{ key }}]
-{% endif %}
-{% if value is iterable %}
-{% for mykey in value %}
-{{ mykey }} = {{ value[mykey] }}
-{% endfor %}
-{% endif %}
+[meta]
+  # Where the metadata/raft database is stored
+  dir = "/var/lib/influxdb/meta"
 
-{% endfor %}
+  retention-autocreate = true
 
+  # If log messages are printed for the meta service
+  logging-enabled = true
+  pprof-enabled = false
+
+  # The default duration for leases.
+  lease-duration = "1m0s"
+
+[data]
+    enabled = true
+    dir = "/var/lib/influxdb/data"
+    wal-dir = "/var/lib/influxdb/wal"
+    wal-logging-enabled = true
+    # trace-logging-enabled = false
+    query-log-enabled = false
+    # cache-max-memory-size = 524288000
+    # cache-snapshot-memory-size = 26214400
+    # cache-snapshot-write-cold-duration = "1h"
+    # compact-min-file-count = 3
+    # compact-full-write-cold-duration = "24h"
+    # max-points-per-block = 1000
+
+[http]
+  enabled = true
+  bind-address = ":8086"
+  auth-enabled = false
+  log-enabled = false
+  write-tracing = false
+  pprof-enabled = false
+  https-enabled = false
+  https-certificate = "/etc/ssl/influxdb.pem"
+  ### Use a separate private key location.
+  # https-private-key = ""
+  max-row-limit = 10000
+  realm = "InfluxDB"
 
 
 [[graphite]]
 
 templates = [
-    {{influxdb_graphite_tpl | union(influxdb_graphite_tpl_custom['add']) | difference(influxdb_graphite_tpl_custom['del']) | join(',\n')}}
+    {% for v in influxdb_graphite_tpl | union(influxdb_graphite_tpl_custom['add']) | difference(influxdb_graphite_tpl_custom['del']) %}
+        "{{v}}",
+    {% endfor %}
 ]

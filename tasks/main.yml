@@ -11,7 +11,7 @@
      - "{{ ansible_distribution }}.yml"
      - "{{ ansible_os_family }}.yml"
 
-- name: 'Set configuration'
+- name: Set configuration
   template:
     src: "{{ influxdb_conf_template }}"
     dest: "{{ influxdb_conf_path }}"
@@ -25,3 +25,8 @@
     name: "{{ influxdb_service_name }}"
     state: started
     enabled: true
+
+# TODO: wait for service to start
+
+- name: Configure service
+  include_tasks: "configure.yml"

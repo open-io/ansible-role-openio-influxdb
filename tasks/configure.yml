@@ -1,0 +1,38 @@
+---
+
+- name: Generate influx CLI command
+  set_fact:
+      influx_cli: /usr/bin/influx -host localhost -port 8086
+
+- name: Setup databases - drop
+  command: >
+    {{influx_cli}} -execute "drop database {{item.name}}"
+  with_items:
+      "{{ influxdb_db | selectattr('state', 'absent') }}"
+
+- name: Setup databases - create
+  command: >
+    {{influx_cli}} -execute "create database {{item.name}}"
+  with_items:
+      "{{ influxdb_db | selectattr('state', 'present') }}"
+
+- name: Setup Retention policies - drop
+  command: >
+    {{influx_cli}} -execute "drop retention policy {{item.name}} on {{item.db}}"
+  ignore_errors: true
+  with_items:
+      "{{ influxdb_rp | selectattr('state', 'absent') }}"
+
+- name: Setup Retention policies - create
+   command: >
+     {{influx_cli}} -execute "create retention policy {{item.name}} on {{item.db}} duration {{item.duration}} replication 1 {{ 'default' if item.default else ''}}"
+  ignore_errors: true
+  with_items:
+      "{{ influxdb_rp | selectattr('state', 'present') }}"
+
+- name: Setup Retention policies - update
+  command: >
+    {{influx_cli}} -execute "alter retention policy {{item.name}} on {{item.db}} duration {{item.duration}} replication 1 {{ 'default' if item.default else ''}}"
+  ignore_errors: true
+  with_items:
+      "{{ influxdb_rp | selectattr('state', 'present') }}"
