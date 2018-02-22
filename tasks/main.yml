@@ -6,18 +6,10 @@
     - "{{ ansible_distribution }}.yml"
     - "{{ ansible_os_family }}.yml"
 
-- include: "{{ item }}"
+- include_tasks: "{{ item }}"
   with_first_found:
-    - "{{ ansible_distribution }}.yml"
-    - "{{ ansible_os_family }}.yml"
-
-# - name: 'TEST ONLY: Create directory'
-#   file:
-#     path: /etc/influxdb
-#     owner: root
-#     group: root
-#     state: directory
-#     mode: 0775
+     - "{{ ansible_distribution }}.yml"
+     - "{{ ansible_os_family }}.yml"
 
 - name: 'Set configuration'
   template:

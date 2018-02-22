@@ -1,8 +1,8 @@
 ---
-
 - name: Install packages
   apt:
-    deb: "{{ item }}"
+    deb: "{{ pkg }}"
   with_items: "{{ influxdb_packages }}"
-
+  loop_control:
+    loop_var: pkg
 ...

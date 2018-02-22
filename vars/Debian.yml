@@ -1,5 +1,4 @@
 ---
-
-influxdb_packages: ["https://dl.influxdata.com/influxdb/releases/influxdb_{{ influxdb_version }}_amd64.deb"]
-
+influxdb_packages:
+  - "https://dl.influxdata.com/influxdb/releases/influxdb_{{ influxdb_version }}_amd64.deb"
 ...
