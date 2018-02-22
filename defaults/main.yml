@@ -11,34 +11,27 @@ influxdb_graphite_tpl_custom:
 influxdb_db:
     - name: graphite
       state: present
-    - name: remove_me
-      state: absent
 
 influxdb_rp:
     - name: ds_30d
       db: graphite
       state: present
-      retention: 30d
+      duration: 30d
       default: true
     - name:  ds_90d
       db: graphite
       state: present
-      retention: 30d
+      duration: 30d
       default: false
     - name:  ds_360d
       db: graphite
       state: present
-      retention: 360d
+      duration: 360d
       default: false
     - name: ds_inf
       db: graphite
       state: present
-      retention: INF
-      default: false
-    - name: ds_remove
-      db: graphite
-      state: absent
-      retention: INF
+      duration: INF
       default: false
 
 influxdb_conf_template: influxdb.conf.j2
