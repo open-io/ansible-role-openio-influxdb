@@ -1,11 +1,7 @@
 ---
 - name: Install and configure InfluxDB
-  hosts: local
+  hosts: localhost
   become : true
   gather_facts: true
-
-#  vars:
-#    var: 'value'
-
   roles:
-    - { role: influxdb }
+    - { role: ansible-role-openio-influxdb }
