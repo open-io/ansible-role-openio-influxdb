@@ -1,33 +1,83 @@
 ---
 
-- name: Generate influx CLI command
+- name: Generate Influx CLI command
   set_fact:
-      influx_cli: /usr/bin/influx -host localhost -port 8086
+      influx_cli: "{{'/usr/bin/influx -host %s -port %s -username %s -password %s'
+      % (influxdb_http['host'], influxdb_http['port'], influxdb_auth['user'], influxdb_auth['password'])}}"
+
+- name: Setup credentials - drop
+  ignore_errors: true
+  command: "{{influx_cli}} -execute 'DROP USER {{influxdb_auth['user']}}'"
+  when:
+      influxdb_auth['state'] == 'present'
+
+- name: Setup credentials - create
+  command: "{{influx_cli}} -execute 'CREATE USER {{influxdb_auth['user']}} WITH PASSWORD {{ influxdb_auth['password'] }} WITH ALL PRIVILEGES'"
+  ignore_errors: true
+  when:
+      influxdb_auth['state'] == 'present'
+
+- name: Setup credentials - set lock
+  set_fact:
+      influxdb_auth_status: true
+  when:
+      influxdb_auth['state'] == 'present'
+
+- name: Setup credentials - apply lock
+  template:
+    src: "{{ influxdb_conf_template }}"
+    dest: "{{ influxdb_conf_path }}"
+    owner: root
+    group: root
+    mode:  0644
+  when:
+      influxdb_auth['state'] == 'present'
+
+- name: Setup credentials - reload
+  service:
+    name: "{{ influxdb_service_name }}"
+    state: reloaded
+  when:
+      influxdb_auth['state'] == 'present'
 
 - name: Setup databases - drop
   command: "{{influx_cli}} -execute 'drop database {{item.name}}'"
+  ignore_errors: true
   with_items:
       "{{ influxdb_db | selectattr('state', 'equalto', 'absent') | list }}"
 
 - name: Setup databases - create
   command: "{{influx_cli}} -execute 'create database {{item.name}}'"
+  ignore_errors: true
   with_items:
       "{{ influxdb_db | selectattr('state', 'equalto', 'present') | list }}"
 
-- name: Setup Retention policies - drop
+- name: Setup retention policies - drop
   command: "{{influx_cli}} -execute 'drop retention policy {{item.name}} on {{item.db}}'"
   ignore_errors: true
   with_items:
       "{{ influxdb_rp | selectattr('state', 'equalto', 'absent') | list }}"
 
-- name: Setup Retention policies - create
+- name: Setup retention policies - create
   command: "{{influx_cli}} -execute 'create retention policy {{item.name}} on {{item.db}} duration {{item.duration}} replication 1 {{ 'default' if item.default else ''}}'"
   ignore_errors: true
   with_items:
       "{{ influxdb_rp | selectattr('state', 'equalto', 'present') | list }}"
 
-- name: Setup Retention policies - update
+- name: Setup retention policies - update
   command: "{{influx_cli}} -execute 'alter retention policy {{item.name}} on {{item.db}} duration {{item.duration}} replication 1 {{ 'default' if item.default else ''}}'"
   ignore_errors: true
   with_items:
       "{{ influxdb_rp | selectattr('state', 'equalto', 'present') | list }}"
+
+- name: Setup downsampling - drop
+  command: "{{influx_cli}} -database {{item.db}} -execute 'drop continuous query {{item.name}} on {{item.db}}'"
+  ignore_errors: true
+  with_items:
+      "{{ influxdb_ds | selectattr('state', 'equalto', 'absent') | list }}"
+
+- name: Setup downsampling - create
+  command: "{{influx_cli}} -database {{item.db}} -execute 'create continuous query {{item.name}} on {{item.db}} begin select mean(value) AS value INTO {{item.db}}.{{item.dst}}.:MEASUREMENT FROM {{item.db}}.{{item.src}}./.*/ GROUP BY time({{item.ds}}), * end'"
+  ignore_errors: true
+  with_items:
+      "{{ influxdb_ds | selectattr('state', 'equalto', 'present') | list }}"

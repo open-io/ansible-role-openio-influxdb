@@ -1,6 +1,8 @@
 ---
 # vars file for ansible-role-influxdb
 
+influxdb_auth_status: false
+
 influxdb_graphite_tpl:
     - "servers.*.cpu.* .host.measurement.cpu.measurement* resource=cpu"
     - "servers.*.diskspace.* .host.measurement.label.measurement* resource=diskspace"

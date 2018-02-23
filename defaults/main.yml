@@ -8,31 +8,56 @@ influxdb_graphite_tpl_custom:
     add:
     del:
 
+influxdb_auth:
+    state: present
+    user: admin
+    password: admin
+
 influxdb_db:
     - name: graphite
       state: present
 
 influxdb_rp:
-    - name: ds_30d
+    - name: realtime
       db: graphite
       state: present
       duration: 30d
       default: true
-    - name:  ds_90d
+    - name: rp_90d
       db: graphite
       state: present
       duration: 30d
       default: false
-    - name:  ds_360d
+    - name: rp_360d
       db: graphite
       state: present
       duration: 360d
       default: false
-    - name: ds_inf
+    - name: rp_inf
       db: graphite
       state: present
       duration: INF
       default: false
+
+influxdb_ds:
+    - name: cq_ds_90d
+      db: graphite
+      state: present
+      src: realtime
+      dst: rp_90d
+      ds: 1m
+    - name: cq_ds_360d
+      db: graphite
+      state: present
+      src: rp_90d
+      dst: rp_360d
+      ds: 20m
+    - name: cq_ds_inf
+      db: graphite
+      state: present
+      src: rp_90d
+      dst: rp_inf
+      ds: 30m
 
 influxdb_conf_template: influxdb.conf.j2
 influxdb_conf_path: /etc/influxdb/influxdb.conf
