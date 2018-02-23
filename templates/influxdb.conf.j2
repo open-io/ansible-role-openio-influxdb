@@ -21,7 +21,7 @@
 
 [http]
   enabled = true
-  bind-address = {{ :influxdb_http['port'] }}
+  bind-address = ":{{ influxdb_http['port'] }}"
   auth-enabled = {{ 'true' if influxdb_auth_status else 'false' }}
   # log-enabled = false
   # write-tracing = false

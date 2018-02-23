@@ -47,9 +47,8 @@
 
 - name: Setup credentials - ensure HTTP available
   wait_for:
-    host: influxdb_http['host']
-    port: influxdb_http['port']
-    delay: 300
+    host: "{{ influxdb_http['host'] }}"
+    port: "{{ influxdb_http['port'] | int }}"
 
 - name: Setup databases - drop
   command: "{{influx_cli}} -execute 'drop database {{item.name}}'"

@@ -1,6 +1,4 @@
 ---
-# tasks file for ansible-role-influxdb
-
 - include_vars: "{{ item }}"
   with_first_found:
     - "{{ ansible_distribution }}.yml"
@@ -18,15 +16,12 @@
     owner: root
     group: root
     mode:  0644
-  notify: restart influxdb
 
 - name: 'Restart service'
   service:
     name: "{{ influxdb_service_name }}"
     state: restarted
     enabled: true
-
-# TODO: wait for service to start
 
 - name: Configure service
   include_tasks: "configure.yml"
