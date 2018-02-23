@@ -13,6 +13,10 @@ influxdb_auth:
     user: admin
     password: admin
 
+influxdb_http:
+    host: localhost
+    port: 8086
+
 influxdb_db:
     - name: graphite
       state: present
@@ -26,7 +30,7 @@ influxdb_rp:
     - name: rp_90d
       db: graphite
       state: present
-      duration: 30d
+      duration: 90d
       default: false
     - name: rp_360d
       db: graphite

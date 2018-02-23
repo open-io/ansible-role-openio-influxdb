@@ -5,6 +5,11 @@
       influx_cli: "{{'/usr/bin/influx -host %s -port %s -username %s -password %s'
       % (influxdb_http['host'], influxdb_http['port'], influxdb_auth['user'], influxdb_auth['password'])}}"
 
+- name: Setup credentials - ensure HTTP available
+  wait_for:
+    host: "{{ influxdb_http['host'] }}"
+    port: "{{ influxdb_http['port'] | int }}"
+
 - name: Setup credentials - drop
   ignore_errors: true
   command: "{{influx_cli}} -execute 'DROP USER {{influxdb_auth['user']}}'"
@@ -12,7 +17,7 @@
       influxdb_auth['state'] == 'present'
 
 - name: Setup credentials - create
-  command: "{{influx_cli}} -execute 'CREATE USER {{influxdb_auth['user']}} WITH PASSWORD {{ influxdb_auth['password'] }} WITH ALL PRIVILEGES'"
+  command: "{{influx_cli}} -execute \"CREATE USER {{influxdb_auth['user']}} WITH PASSWORD '{{ influxdb_auth['password'] }}' WITH ALL PRIVILEGES\""
   ignore_errors: true
   when:
       influxdb_auth['state'] == 'present'
@@ -33,12 +38,18 @@
   when:
       influxdb_auth['state'] == 'present'
 
-- name: Setup credentials - reload
+- name: Setup credentials - restart
   service:
     name: "{{ influxdb_service_name }}"
-    state: reloaded
+    state: restarted
   when:
       influxdb_auth['state'] == 'present'
+
+- name: Setup credentials - ensure HTTP available
+  wait_for:
+    host: influxdb_http['host']
+    port: influxdb_http['port']
+    delay: 300
 
 - name: Setup databases - drop
   command: "{{influx_cli}} -execute 'drop database {{item.name}}'"

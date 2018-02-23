@@ -28,7 +28,7 @@
 [http]
   enabled = true
   bind-address = ":8086"
-  auth-enabled = {{ influxdb_auth_status }}
+  auth-enabled = {{ 'true' if influxdb_auth_status else 'false' }}
   log-enabled = false
   write-tracing = false
   pprof-enabled = false
