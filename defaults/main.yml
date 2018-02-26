@@ -3,10 +3,9 @@
 
 influxdb_version: '1.2.4'
 
-
 influxdb_graphite_tpl_custom:
-    add:
-    del:
+    add: []
+    del: []
 
 influxdb_auth:
     state: present

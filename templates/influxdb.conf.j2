@@ -22,7 +22,7 @@
 [http]
   enabled = true
   bind-address = ":{{ influxdb_http['port'] }}"
-  auth-enabled = {{ 'true' if influxdb_auth_status else 'false' }}
+  auth-enabled = {{ 'true' if influxdb_auth['state'] else 'false' }}
   # log-enabled = false
   # write-tracing = false
   # pprof-enabled = false
@@ -43,7 +43,7 @@
   # batch-pending = 50
   # batch-timeout = "10s"
   # udp-read-buffer = 0
-  # separator = "_"
+  separator = "_"
   # tags = ["region=us-east", "zone=1c"]
   templates = [
     {% for v in influxdb_graphite_tpl | union(influxdb_graphite_tpl_custom['add']) | difference(influxdb_graphite_tpl_custom['del']) %}
