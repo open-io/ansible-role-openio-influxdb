@@ -91,3 +91,17 @@
   ignore_errors: true
   with_items:
       "{{ influxdb_ds | selectattr('state', 'equalto', 'present') | list }}"
+
+- name: Setup grafana variables - drop
+  command: "{{influx_cli}} -database {{ influxdb_grafana_vars['db'] }} -execute 'delete from \"{{ influxdb_grafana_vars['dst'] }}\".\"ds_interval\"'"
+  ignore_errors: true
+  when:
+      "{{ influxdb_grafana_vars['state'] != 'present' }}"
+
+- name: Setup grafana variables - create
+  command: "{{influx_cli}} -database {{ influxdb_grafana_vars['db'] }} -execute 'INSERT into influxdb_grafana_vars['dst'] ds_interval,ds={{item.name}},int={{item.every}} value=0'"
+  ignore_errors: true
+  when:
+      "{{ influxdb_grafana_vars['state'] == 'present' }}"
+  with_items:
+      "{{ influxdb_rp | selectattr('state', 'equalto', 'present') | list }}"

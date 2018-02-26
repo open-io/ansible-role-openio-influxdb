@@ -27,21 +27,30 @@ influxdb_rp:
       state: present
       duration: 30d
       default: true
+      every: 10s
     - name: rp_90d
       db: graphite
       state: present
       duration: 90d
       default: false
+      every: 1m
     - name: rp_360d
       db: graphite
       state: present
       duration: 360d
       default: false
+      every: 20m
     - name: rp_inf
       db: graphite
       state: present
       duration: INF
       default: false
+      every: 30m
+
+influxdb_grafana_vars:
+    state: present
+    dst: rp_inf
+    db: graphite
 
 influxdb_ds:
     - name: cq_ds_90d
