@@ -54,43 +54,43 @@
   command: "{{influx_cli}} -execute 'drop database {{item.name}}'"
   ignore_errors: true
   with_items:
-      "{{ influxdb_db | selectattr('state', 'equalto', 'absent') | list }}"
+      "{{ influxdb_db | selectattr('state', 'match', '^absent$') | list }}"
 
 - name: Setup databases - create
   command: "{{influx_cli}} -execute 'create database {{item.name}}'"
   ignore_errors: true
   with_items:
-      "{{ influxdb_db | selectattr('state', 'equalto', 'present') | list }}"
+      "{{ influxdb_db | selectattr('state', 'match', '^present$') | list }}"
 
 - name: Setup retention policies - drop
   command: "{{influx_cli}} -execute 'drop retention policy {{item.name}} on {{item.db}}'"
   ignore_errors: true
   with_items:
-      "{{ influxdb_rp | selectattr('state', 'equalto', 'absent') | list }}"
+      "{{ influxdb_rp | selectattr('state', 'match', '^absent$') | list }}"
 
 - name: Setup retention policies - create
   command: "{{influx_cli}} -execute 'create retention policy {{item.name}} on {{item.db}} duration {{item.duration}} replication 1 {{ 'default' if item.default else ''}}'"
   ignore_errors: true
   with_items:
-      "{{ influxdb_rp | selectattr('state', 'equalto', 'present') | list }}"
+      "{{ influxdb_rp | selectattr('state', 'match', '^present$') | list }}"
 
 - name: Setup retention policies - update
   command: "{{influx_cli}} -execute 'alter retention policy {{item.name}} on {{item.db}} duration {{item.duration}} replication 1 {{ 'default' if item.default else ''}}'"
   ignore_errors: true
   with_items:
-      "{{ influxdb_rp | selectattr('state', 'equalto', 'present') | list }}"
+      "{{ influxdb_rp | selectattr('state', 'match', '^present$') | list }}"
 
 - name: Setup downsampling - drop
   command: "{{influx_cli}} -database {{item.db}} -execute 'drop continuous query {{item.name}} on {{item.db}}'"
   ignore_errors: true
   with_items:
-      "{{ influxdb_ds | selectattr('state', 'equalto', 'absent') | list }}"
+      "{{ influxdb_ds | selectattr('state', 'match', '^absent$') | list }}"
 
 - name: Setup downsampling - create
   command: "{{influx_cli}} -database {{item.db}} -execute 'create continuous query {{item.name}} on {{item.db}} begin select mean(value) AS value INTO {{item.db}}.{{item.dst}}.:MEASUREMENT FROM {{item.db}}.{{item.src}}./.*/ GROUP BY time({{item.ds}}), * end'"
   ignore_errors: true
   with_items:
-      "{{ influxdb_ds | selectattr('state', 'equalto', 'present') | list }}"
+      "{{ influxdb_ds | selectattr('state', 'match', '^present$') | list }}"
 
 - name: Setup grafana variables - drop
   command: "{{influx_cli}} -database {{ influxdb_grafana_vars['db'] }} -execute 'delete from \"{{ influxdb_grafana_vars['dst'] }}\".\"ds_interval\"'"
@@ -104,4 +104,4 @@
   when:
       influxdb_grafana_vars['state'] == 'present'
   with_items:
-      "{{ influxdb_rp | selectattr('state', 'equalto', 'present') | list }}"
+      "{{ influxdb_rp | selectattr('state', 'match', '^present$') | list }}"
